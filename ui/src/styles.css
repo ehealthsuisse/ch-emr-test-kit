@@ -1,0 +1,351 @@
+:root {
+  --bg: #f6f7f9;
+  --card: #fff;
+  --border: #d7dbe0;
+  --text: #1f2933;
+  --muted: #6b7280;
+  --accent: #1f6feb;
+  --accent-dark: #1a5fd0;
+  --danger: #c1382b;
+  --ok: #1a7f37;
+  --required: #c1382b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.45;
+}
+
+#app-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #0d1117;
+  color: #fff;
+}
+#app-header .brand {
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+}
+#nav a {
+  color: #c9d1d9;
+  text-decoration: none;
+  margin-right: 1rem;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin: 0.2rem 0 0.6rem;
+}
+h2 {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+a {
+  color: var(--accent);
+}
+.muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.crumbs {
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn {
+  display: inline-block;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.btn:hover {
+  background: #f0f2f5;
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn.primary:hover {
+  background: var(--accent-dark);
+}
+.btn.small {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  margin-right: 0.25rem;
+}
+.btn.danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ig-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.ig-card {
+  display: block;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  text-decoration: none;
+  color: var(--text);
+}
+.ig-card:hover {
+  border-color: var(--accent);
+}
+.ig-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  margin-top: 0.5rem;
+}
+th,
+td {
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  vertical-align: top;
+}
+th {
+  background: #eef1f4;
+}
+td.url,
+.profile-meta {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  word-break: break-all;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+/* Form engine */
+.object {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.el-group {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 0.7rem;
+  margin: 0;
+}
+.el-group[open] {
+  padding: 0 0.7rem 0.7rem;
+}
+.el-group.required {
+  border-left: 3px solid var(--required);
+}
+.el-group > summary {
+  font-size: 0.85rem;
+  padding: 0.45rem 0.3rem;
+  cursor: pointer;
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  user-select: none;
+  list-style: none;
+}
+.el-group > summary::-webkit-details-marker {
+  display: none;
+}
+.el-group > summary::before {
+  content: "▸";
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+.el-group[open] > summary::before {
+  content: "▾";
+}
+.el-group > summary:hover {
+  color: var(--accent);
+}
+.el-name {
+  font-weight: 600;
+}
+.el-card {
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+}
+.el-short {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.78rem;
+}
+.occ-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.occ-row {
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+.occ-row > :first-child {
+  flex: 1;
+}
+.rm-btn {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  color: var(--danger);
+}
+.add-btn {
+  align-self: flex-start;
+  border: 1px dashed var(--border);
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+}
+.input {
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+textarea.input {
+  min-height: 3rem;
+}
+.choice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.choice-type {
+  max-width: 200px;
+}
+.prim .field-error,
+.field-error {
+  color: var(--danger);
+  font-size: 0.78rem;
+}
+.locked {
+  background: #f0f2f5;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0.3rem 0.5rem;
+  margin: 0;
+  font-size: 0.8rem;
+}
+.extension {
+  border-left: 2px dotted var(--accent);
+  padding-left: 0.5rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.form-status {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.issues {
+  margin-top: 0.8rem;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.85rem;
+}
+.issues.client {
+  background: #fff8e6;
+  border: 1px solid #f0d98c;
+}
+.issues.server.ok {
+  background: #e9f7ee;
+  border: 1px solid #a5d6b7;
+}
+.issues.server.has-errors {
+  background: #fdecea;
+  border: 1px solid #f0a9a2;
+}
+.issues ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+}
+.issue .sev {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  margin-right: 0.4rem;
+}
+.issue.error .sev,
+.issue.fatal .sev {
+  color: var(--danger);
+}
+.issue .loc {
+  color: var(--muted);
+  margin-left: 0.4rem;
+  font-family: ui-monospace, monospace;
+}
+.json-view {
+  background: #0d1117;
+  color: #c9d1d9;
+  padding: 0.6rem;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.78rem;
+}
+.loading {
+  color: var(--muted);
+  padding: 0.6rem 0;
+}
+.error-box {
+  background: #fdecea;
+  border: 1px solid #f0a9a2;
+  color: var(--danger);
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  margin-top: 0.6rem;
+}
