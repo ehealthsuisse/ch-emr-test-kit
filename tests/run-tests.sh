@@ -3,13 +3,11 @@
 # Assumes the stack is already up (see provision.sh) with the CH EMR IG loaded.
 #
 #   FHIR_BASE  default http://localhost:8080/fhir
-#   UI_BASE    default http://localhost:8888
 #
 # Exit code is non-zero if any assertion fails.
 set -uo pipefail
 
 FHIR_BASE="${FHIR_BASE:-http://localhost:8080/fhir}"
-UI_BASE="${UI_BASE:-http://localhost:8888}"
 
 pass=0
 fail=0
@@ -19,7 +17,6 @@ no() { echo "  FAIL: $1"; fail=$((fail + 1)); }
 jq_py() { python3 -c "$1"; } # read JSON on stdin, run python snippet
 
 echo "FHIR_BASE=$FHIR_BASE"
-echo "UI_BASE=$UI_BASE"
 echo
 
 echo "[1] Server capability statement"
@@ -61,11 +58,6 @@ if [ -n "$prof_url" ] && [ -n "$prof_type" ]; then
 else
   no "no CH EMR constraint profile discovered to validate against"
 fi
-
-echo "[4] Custom UI serves the SPA and proxies the FHIR API"
-curl -s "$UI_BASE/" | grep -q "FHIR Test Kit" && ok "UI serves the SPA" || no "UI did not serve the SPA"
-uirt=$(curl -s "$UI_BASE/fhir/metadata" | jq_py 'import sys,json; print(json.load(sys.stdin).get("resourceType",""))' 2>/dev/null)
-[ "$uirt" = "CapabilityStatement" ] && ok "UI proxies /fhir to the server" || no "UI /fhir proxy failed (got '$uirt')"
 
 echo
 echo "================================"

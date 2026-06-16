@@ -39,14 +39,5 @@ services:
     # volumes:
     #   - ${BRANDING_DIR:-./fhir-server/branding}:/branding:ro
 
-  ui:
-    image: ${IMAGE_PREFIX:-digisante-fhir-test-kit}-ui:${IMAGE_VERSION:-0.1.0}
-    build:
-      context: ./ui
-    depends_on:
-      - fhir
-    ports:
-      - "${UI_PORT:-8888}:80"
-
 volumes:
   hapi-pgdata:

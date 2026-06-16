@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Build and start the test-kit stack (db + fhir + ui) with the CH EMR IG loaded,
-# then wait until the server, the loaded profiles, and the UI are all ready.
+# Build and start the test-kit stack (db + fhir) with the CH EMR IG loaded,
+# then wait until the server and the loaded profiles are ready.
 #
 # Provider-agnostic: set COMPOSE to "podman-compose", "podman compose", or
 # "docker compose". Defaults to podman-compose (used in the multipass VM and CI).
@@ -11,7 +11,6 @@ cd "$(dirname "$0")/.."
 export HAPI_VERSION="${HAPI_VERSION:-v8.4.0-3}"
 export IMAGE_VERSION="${IMAGE_VERSION:-0.1.0}"
 export FHIR_PORT="${FHIR_PORT:-8080}"
-export UI_PORT="${UI_PORT:-8888}"
 # CH EMR Implementation Guide (https://hl7ch.github.io/ch-emr).
 export IG_URLS="${IG_URLS:-ch.fhir.ig.ch-emr@1.0.0-ballot=https://hl7ch.github.io/ch-emr/package.tgz}"
 
@@ -49,7 +48,5 @@ for _ in $(seq 1 120); do
   echo -n "."
   sleep 5
 done
-
-wait_for "UI" "http://localhost:${UI_PORT}/" 30
 
 echo "Provisioning complete."

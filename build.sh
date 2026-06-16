@@ -23,7 +23,6 @@ IMAGE_VERSION="${IMAGE_VERSION:-0.1.0}"
 IMAGE_PREFIX="${IMAGE_PREFIX:-digisante-fhir-test-kit}"
 
 FHIR_IMAGE="${IMAGE_PREFIX}-hapi-${HAPI_VERSION}:${IMAGE_VERSION}"
-UI_IMAGE="${IMAGE_PREFIX}-ui:${IMAGE_VERSION}"
 
 echo "Building FHIR server image: ${FHIR_IMAGE} (HAPI ${HAPI_VERSION})"
 docker build \
@@ -32,15 +31,8 @@ docker build \
   -f fhir-server/Dockerfile \
   fhir-server
 
-echo "Building UI image: ${UI_IMAGE}"
-docker build \
-  -t "${UI_IMAGE}" \
-  -f ui/Dockerfile \
-  ui
-
 echo
 echo "Built:"
 echo "  ${FHIR_IMAGE}"
-echo "  ${UI_IMAGE}"
 echo
 echo "Run with: HAPI_VERSION=${HAPI_VERSION} IMAGE_VERSION=${IMAGE_VERSION} docker compose up -d"
