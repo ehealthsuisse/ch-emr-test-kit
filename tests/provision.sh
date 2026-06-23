@@ -23,9 +23,18 @@ echo "  IG_URLS=$IG_URLS"
 # shellcheck disable=SC2086
 $COMPOSE up -d --build
 
-# Container runtime used for diagnostics / fail-fast (podman or docker).
-RT=""
-if command -v podman >/dev/null 2>&1; then RT=podman; elif command -v docker >/dev/null 2>&1; then RT=docker; fi
+# Container runtime used for diagnostics / fail-fast — match it to $COMPOSE so we
+# inspect the containers the compose tool actually created.
+case "$COMPOSE" in
+  *docker*) RT=docker ;;
+  *podman*) RT=podman ;;
+  *) RT="" ;;
+esac
+if [ -z "$RT" ] || ! command -v "$RT" >/dev/null 2>&1; then
+  if command -v podman >/dev/null 2>&1; then RT=podman
+  elif command -v docker >/dev/null 2>&1; then RT=docker
+  else RT=""; fi
+fi
 
 dump_logs() {
   [ -n "$RT" ] || return 0
