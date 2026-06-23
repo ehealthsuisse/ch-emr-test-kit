@@ -35,7 +35,10 @@ wait_for() {
   return 1
 }
 
-wait_for "FHIR server" "http://localhost:${FHIR_PORT}/fhir/metadata" 60
+# The server only starts serving after boot-time IG install completes, and with
+# transitive dependencies that means downloading/installing ~10-15 packages, so
+# allow generous time.
+wait_for "FHIR server" "http://localhost:${FHIR_PORT}/fhir/metadata" 150
 
 # The CH EMR IG plus its dependencies take a while to download and install on the
 # first boot; poll until constraint profiles appear.

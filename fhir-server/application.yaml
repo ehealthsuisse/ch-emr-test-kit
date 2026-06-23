@@ -1,3 +1,7 @@
+logging:
+  level:
+    ca.uhn.fhir.jpa.packages: ${LOG_PACKAGES:INFO}
+
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://db:5432/hapi}
@@ -50,6 +54,15 @@ hapi:
 
     # Let the custom UI install/replace packages at runtime if needed.
     ig_runtime_upload_enabled: true
+
+    # Download and install the full transitive dependency closure of every loaded
+    # IG (the packages declared in each package.json's dependencies, recursively).
+    # This pulls in base IGs such as ch-core / ch-term and the HL7 terminology and
+    # extension packages, so profiles a loaded IG builds on — including profiles
+    # referenced via the structuredefinition-imposeProfile extension, whose target
+    # packages are part of that dependency closure — are present for snapshot
+    # generation and $validate.
+    install_transitive_ig_dependencies: ${HAPI_FHIR_INSTALL_TRANSITIVE_IG_DEPENDENCIES:true}
 
     # Branding for the built-in tester. The starter serves /content/** from this
     # path, so the tester picks up custom/logo.jpg and custom/welcome.html, and

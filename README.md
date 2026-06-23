@@ -57,6 +57,23 @@ The container entrypoint expands `IG_URLS` into the native HAPI
 `HAPI_FHIR_IMPLEMENTATIONGUIDES_*` environment variables also work directly if you
 prefer to bypass `IG_URLS`.
 
+### Dependencies
+
+Each loaded IG's declared dependency packages are fetched and installed
+transitively (`fetchDependencies`), so the base IGs it builds on — and profiles it
+references via the `structuredefinition-imposeProfile` extension — are present for
+snapshot generation and `$validate`. For example, loading CH EMR also installs
+ch-core, ch-term, ch-ips, ch-emed, the HL7 extensions and **hl7.fhir.uv.ips** (the
+source of CH EMR's imposed IPS profiles), and validating a resource against a
+CH EMR profile then also enforces the imposed IPS profile.
+
+A few HL7 "infrastructure" packages cannot be ingested by HAPI's package installer
+and would abort startup (`hl7.terminology.r4` → `HAPI-1764`; `hl7.fhir.uv.xver-r5.r4`
+→ over-long resource ids). These are **excluded by default** (they provide
+terminology/cross-version helpers, not profiles). Adjust with
+`IG_DEPENDENCY_EXCLUDES` (comma-separated regexes on package id; set empty to attempt
+everything).
+
 ## Branding the built-in tester
 
 The tester's **logo, name and welcome/sample text** default to HL7 Switzerland and

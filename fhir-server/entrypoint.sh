@@ -45,7 +45,31 @@ if [ -n "${IG_URLS:-}" ]; then
     export "HAPI_FHIR_IMPLEMENTATIONGUIDES_IG${i}_NAME=${name}"
     export "HAPI_FHIR_IMPLEMENTATIONGUIDES_IG${i}_VERSION=${version}"
     export "HAPI_FHIR_IMPLEMENTATIONGUIDES_IG${i}_INSTALLMODE=STORE_AND_INSTALL"
-    echo "[entrypoint] IG ${i}: name=${name} version=${version} url=${url}"
+    # Pull in the IG's declared dependency packages (ch-core, terminology,
+    # IPS/extensions, etc.) — including packages that provide profiles referenced
+    # via the structuredefinition-imposeProfile extension — so they install too.
+    export "HAPI_FHIR_IMPLEMENTATIONGUIDES_IG${i}_FETCHDEPENDENCIES=true"
+
+    # Exclude dependency packages (regex on package id) from transitive install.
+    # The defaults are "infrastructure" packages that HAPI's package installer
+    # cannot ingest and which would otherwise abort startup:
+    #   hl7.terminology.r4      -> HAPI-1764 "theKey must not be null"
+    #   hl7.fhir.uv.xver-r5.r4  -> HAPI-0521 invalid (over-long) FHIR resource id
+    # These provide terminology/cross-version helpers, not profiles, so excluding
+    # them does not affect the IGs' profiles (incl. imposeProfile targets).
+    # Override/clear via IG_DEPENDENCY_EXCLUDES (comma-separated; empty to disable).
+    excludes=${IG_DEPENDENCY_EXCLUDES-hl7.terminology.r4,hl7.fhir.uv.xver-r5.r4}
+    k=0
+    while [ -n "$excludes" ]; do
+      case "$excludes" in
+        *,*) ex=${excludes%%,*}; excludes=${excludes#*,} ;;
+        *)   ex=$excludes; excludes= ;;
+      esac
+      ex=$(trim "$ex")
+      [ -n "$ex" ] && { export "HAPI_FHIR_IMPLEMENTATIONGUIDES_IG${i}_DEPENDENCYEXCLUDES_${k}=${ex}"; k=$((k + 1)); }
+    done
+
+    echo "[entrypoint] IG ${i}: name=${name} version=${version} url=${url} (fetchDependencies=true, excludes=${IG_DEPENDENCY_EXCLUDES-hl7.terminology.r4,hl7.fhir.uv.xver-r5.r4})"
     i=$((i + 1))
     IFS=','
   done

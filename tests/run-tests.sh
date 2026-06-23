@@ -23,41 +23,38 @@ echo "[1] Server capability statement"
 rt=$(curl -s "$FHIR_BASE/metadata" | jq_py 'import sys,json; print(json.load(sys.stdin).get("resourceType",""))' 2>/dev/null)
 [ "$rt" = "CapabilityStatement" ] && ok "metadata is a CapabilityStatement" || no "metadata not a CapabilityStatement (got '$rt')"
 
-echo "[2] CH EMR Implementation Guide loaded"
-# HAPI only returns Bundle.total when asked with _summary=count.
+# Look a specific StructureDefinition up by canonical URL; echoes its Bundle.total.
+sd_count() {
+  local enc
+  enc=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$1")
+  curl -s "$FHIR_BASE/StructureDefinition?url=$enc&_summary=count" \
+    | jq_py 'import sys,json; print(json.load(sys.stdin).get("total",0))' 2>/dev/null
+}
+
+CH_EMR_COMPOSITION="http://fhir.ch/ig/ch-emr/StructureDefinition/ch-emr-composition"
+IPS_COMPOSITION="http://hl7.org/fhir/uv/ips/StructureDefinition/Composition-uv-ips"
+
+echo "[2] CH EMR IG and its dependencies are installed"
+# HAPI only returns Bundle.total when asked with _summary=count. Query specific
+# canonicals (robust regardless of how many StructureDefinitions/pages exist).
 total=$(curl -s "$FHIR_BASE/StructureDefinition?_summary=count" | jq_py 'import sys,json; print(json.load(sys.stdin).get("total",0))' 2>/dev/null)
-profiles=$(curl -s "$FHIR_BASE/StructureDefinition?_count=200")
-chcount=$(printf '%s' "$profiles" | jq_py 'import sys,json; d=json.load(sys.stdin); print(sum(1 for e in d.get("entry",[]) if "ch-emr" in (e["resource"].get("url") or "")))' 2>/dev/null)
 { [ -n "$total" ] && [ "$total" -gt 0 ]; } && ok "StructureDefinitions present (total=$total)" || no "no StructureDefinitions loaded"
-{ [ -n "$chcount" ] && [ "$chcount" -gt 0 ]; } && ok "CH EMR profiles present (count=$chcount)" || no "no ch-emr profiles found"
+[ "$(sd_count "$CH_EMR_COMPOSITION")" = "1" ] && ok "CH EMR profile present (ch-emr-composition)" || no "CH EMR profile ch-emr-composition not found"
+# The IPS Composition profile arrives only as a transitive dependency of CH EMR
+# (and is the target of an imposeProfile extension) — so its presence proves
+# dependency installation worked.
+[ "$(sd_count "$IPS_COMPOSITION")" = "1" ] && ok "dependency profile present (Composition-uv-ips from hl7.fhir.uv.ips)" || no "dependency profile Composition-uv-ips not found"
 
-echo "[3] Profile-restricted validation enforces the profile"
-# Pick a CH EMR constraint profile (prefer a resource type with mandatory base
-# elements, so an empty instance is guaranteed to fail validation), then $validate
-# an empty resource of that type against the profile.
-read -r prof_url prof_type <<EOF
-$(printf '%s' "$profiles" | jq_py 'import sys,json
-d=json.load(sys.stdin)
-cands=[(e["resource"]["url"], e["resource"].get("type","")) for e in d.get("entry",[])
-       if "ch-emr" in (e["resource"].get("url") or "") and e["resource"].get("type") not in ("Extension","")]
-pref=[c for c in cands if c[1] in ("Composition","Observation","MedicationStatement","DocumentReference")]
-chosen=(pref or cands or [("","")])[0]
-print(chosen[0], chosen[1])' 2>/dev/null)
-EOF
-
-if [ -n "$prof_url" ] && [ -n "$prof_type" ]; then
-  ok "discovered CH EMR profile to validate: $prof_type ($prof_url)"
-  enc=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$prof_url")
-  invalid=$(curl -s -X POST "$FHIR_BASE/${prof_type}/\$validate?profile=$enc" \
-    -H 'Content-Type: application/fhir+json' \
-    -d "{\"resourceType\":\"${prof_type}\"}")
-  irt=$(printf '%s' "$invalid" | jq_py 'import sys,json; print(json.load(sys.stdin).get("resourceType",""))' 2>/dev/null)
-  ierrs=$(printf '%s' "$invalid" | jq_py 'import sys,json; d=json.load(sys.stdin); print(sum(1 for i in d.get("issue",[]) if i.get("severity") in ("error","fatal")))' 2>/dev/null)
-  [ "$irt" = "OperationOutcome" ] && ok "\$validate returns an OperationOutcome" || no "\$validate did not return an OperationOutcome"
-  { [ -n "$ierrs" ] && [ "$ierrs" -gt 0 ]; } && ok "empty ${prof_type} rejected by profile ($ierrs error issue(s))" || no "empty ${prof_type} was not rejected"
-else
-  no "no CH EMR constraint profile discovered to validate against"
-fi
+echo "[3] Profile-restricted validation enforces the profile (and imposed profiles)"
+enc=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$CH_EMR_COMPOSITION")
+invalid=$(curl -s -X POST "$FHIR_BASE/Composition/\$validate?profile=$enc" \
+  -H 'Content-Type: application/fhir+json' -d '{"resourceType":"Composition"}')
+irt=$(printf '%s' "$invalid" | jq_py 'import sys,json; print(json.load(sys.stdin).get("resourceType",""))' 2>/dev/null)
+ierrs=$(printf '%s' "$invalid" | jq_py 'import sys,json; d=json.load(sys.stdin); print(sum(1 for i in d.get("issue",[]) if i.get("severity") in ("error","fatal")))' 2>/dev/null)
+imposed=$(printf '%s' "$invalid" | jq_py 'import sys,json; d=json.load(sys.stdin); print(sum(1 for i in d.get("issue",[]) if "uv/ips" in json.dumps(i)))' 2>/dev/null)
+[ "$irt" = "OperationOutcome" ] && ok "\$validate returns an OperationOutcome" || no "\$validate did not return an OperationOutcome"
+{ [ -n "$ierrs" ] && [ "$ierrs" -gt 0 ]; } && ok "empty Composition rejected by profile ($ierrs error issue(s))" || no "empty Composition was not rejected"
+{ [ -n "$imposed" ] && [ "$imposed" -gt 0 ]; } && ok "imposed IPS profile enforced ($imposed issue(s) from Composition-uv-ips)" || no "imposed IPS profile not enforced"
 
 echo
 echo "================================"

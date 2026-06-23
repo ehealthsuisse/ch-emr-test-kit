@@ -28,6 +28,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-hapi}
       # Implementation Guides to load at startup (see .env.example).
       IG_URLS: ${IG_URLS:-}
+      LOG_PACKAGES: ${LOG_PACKAGES:-INFO}
     ports:
       - "${FHIR_PORT:-8080}:8080"
     # Branding override: the image ships HL7 Switzerland defaults at /branding.
