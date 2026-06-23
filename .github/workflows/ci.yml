@@ -3,7 +3,16 @@ name: CI
 on:
   push:
     branches: ["**"]
+    tags:
+      - "v*"
+      - "[0-9]*"
   pull_request:
+
+env:
+  # HAPI FHIR base version baked into the published image.
+  HAPI_VERSION: v8.4.0-3
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   test:
@@ -28,3 +37,54 @@ jobs:
       - name: Dump container logs on failure
         if: failure()
         run: COMPOSE=podman-compose podman-compose logs --tail=300 || true
+
+  publish:
+    name: Publish image
+    needs: test
+    # Publish only for branch/tag pushes (not PRs): `latest` from main, a
+    # version-tagged image from git tags.
+    if: >-
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to ${{ env.REGISTRY }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Derive image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=tag
+            type=raw,value=hapi-${{ env.HAPI_VERSION }}
+            type=sha
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push FHIR server image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./fhir-server
+          build-args: |
+            HAPI_VERSION=${{ env.HAPI_VERSION }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
