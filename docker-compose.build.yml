@@ -8,7 +8,7 @@
 # versioned tags (1.0.0, …) or latest, and are never pushed to the registry.
 services:
   fhir:
-    image: ${LOCAL_IMAGE:-digisante-fhir-test-kit}:${LOCAL_TAG:-local}
+    image: ${LOCAL_IMAGE:-ch-emr-test-kit}:${LOCAL_TAG:-local}
     pull_policy: build
     build:
       context: ./fhir-server

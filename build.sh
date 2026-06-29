@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Build the DigiSanté FHIR Test Kit image from source.
+# Build the CH EMR Test Kit image from source.
 #
 # Local builds use a distinct "local" tag scheme (an unqualified image name with
 # the LOCAL_TAG tag, default "local") so they never collide with the published
@@ -22,7 +22,7 @@ if [ -f .env ]; then
 fi
 
 HAPI_VERSION="${HAPI_VERSION:-v8.4.0-3}"
-LOCAL_IMAGE="${LOCAL_IMAGE:-digisante-fhir-test-kit}"
+LOCAL_IMAGE="${LOCAL_IMAGE:-ch-emr-test-kit}"
 LOCAL_TAG="${LOCAL_TAG:-local}"
 
 FHIR_IMAGE="${LOCAL_IMAGE}:${LOCAL_TAG}"

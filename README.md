@@ -1,4 +1,4 @@
-# DigiSanté FHIR Test Kit
+# CH EMR Test Kit
 
 A disposable, versioned HAPI FHIR server with the built-in **hapi.fhir.org-style
 tester** (a clone of [hapi.fhir.org](https://hapi.fhir.org/)) for unrestricted CRUD.
@@ -14,7 +14,7 @@ and the tester is branded for HL7 Switzerland.
 | Service | Image | Port | Purpose |
 | --- | --- | --- | --- |
 | `db` | `postgres:16-alpine` | — | Persistence |
-| `fhir` | `ghcr.io/trifork/digisante-fhir-test-kit:<tag>` (built `FROM hapiproject/hapi`) | 8080 | FHIR REST API + generic tester |
+| `fhir` | `ghcr.io/ehealthsuisse/ch-emr-test-kit:<tag>` (built `FROM hapiproject/hapi`) | 8080 | FHIR REST API + generic tester |
 
 > **Base-image note:** the FHIR image is built `FROM hapiproject/hapi:<version>`,
 > which is a distroless/Debian image — *not* Alpine. To make it Alpine, switch to a
@@ -24,8 +24,8 @@ and the tester is branded for HL7 Switzerland.
 
 The FHIR image is published to the GitHub Container Registry by CI:
 
-- `ghcr.io/trifork/digisante-fhir-test-kit:latest` — rolling, from `main`.
-- `ghcr.io/trifork/digisante-fhir-test-kit:<version>` — immutable, from git tags
+- `ghcr.io/ehealthsuisse/ch-emr-test-kit:latest` — rolling, from `main`.
+- `ghcr.io/ehealthsuisse/ch-emr-test-kit:<version>` — immutable, from git tags
   (`1.0.0`, `1.0`, `1`); plus `hapi-<HAPI_VERSION>` and `sha-<sha>` tags.
 
 By default `docker compose up` **pulls** the published image (`latest`, or pin
@@ -36,7 +36,7 @@ never collide with the published versioned tags or `latest`.
 
 ```bash
 cp .env.example .env          # then edit IG_URLS, IMAGE_TAG, ports
-docker compose up -d          # pulls ghcr.io/trifork/digisante-fhir-test-kit:${IMAGE_TAG:-latest}
+docker compose up -d          # pulls ghcr.io/ehealthsuisse/ch-emr-test-kit:${IMAGE_TAG:-latest}
 ```
 
 - Generic tester + API: <http://localhost:8080>
@@ -52,7 +52,7 @@ docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 ./build.sh
 ```
 
-This builds `digisante-fhir-test-kit:${LOCAL_TAG:-local}` (HAPI version from
+This builds `ch-emr-test-kit:${LOCAL_TAG:-local}` (HAPI version from
 `HAPI_VERSION`) instead of pulling.
 
 ## Loading Implementation Guides
