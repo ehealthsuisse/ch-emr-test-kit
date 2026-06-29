@@ -1,4 +1,4 @@
-# Versioned DigiSanté FHIR Test Kit server image.
+# Versioned CH EMR Test Kit server image.
 # The specific HAPI FHIR version is selected at build time via HAPI_VERSION and
 # is baked into the published image NAME (see build.sh), while IMAGE_VERSION is
 # carried as a separate image tag.
