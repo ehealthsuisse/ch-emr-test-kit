@@ -3,7 +3,7 @@
 A disposable, versioned HAPI FHIR server with the built-in **hapi.fhir.org-style
 tester** (a clone of [hapi.fhir.org](https://hapi.fhir.org/)) for unrestricted CRUD.
 Implementation Guides are loaded into the server **from a URL at container startup**,
-and the tester is branded for HL7 Switzerland.
+and the tester is branded for eHealth Suisse.
 
 > The profile-restricted, per-IG CRUD UI (dynamic forms generated from each
 > profile's `StructureDefinition`) lives on the **`feat/ig-profile-ui`** branch,
@@ -99,14 +99,17 @@ subfolders. This maps to HAPI's per-IG `implementationguides.<id>.additionalReso
 
 ## Branding the built-in tester
 
-The tester's **logo, name and welcome/sample text** default to HL7 Switzerland and
+The tester's **logo, name and welcome/sample text** default to eHealth Suisse and
 are overridable via a container mount. The image ships defaults under `/branding`:
 
 ```
-/branding/custom/logo.jpg      # logo in the tester banner
+/branding/custom/logo.svg      # logo in the tester banner (SVG; .jpg also works)
 /branding/custom/welcome.html  # welcome / sample text on the home page
 /branding/name.txt             # server name shown in the navbar
 ```
+
+The banner template is patched (in the image build) to load `content/custom/logo.svg`,
+falling back to `content/custom/logo.jpg` and then the built-in sample logo.
 
 To customise, mount a host directory (same layout) over `/branding` — uncomment the
 `volumes` block on the `fhir` service in `docker-compose.yml` and set `BRANDING_DIR`,

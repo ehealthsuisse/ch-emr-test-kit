@@ -32,12 +32,12 @@ hapi:
     fhir_version: R4
 
     # Generic hapi.fhir.org-style tester UI (served by this server on :8080).
-    # The displayed name defaults to HL7 Switzerland and can be overridden via the
+    # The displayed name defaults to eHealth Suisse and can be overridden via the
     # HAPI_FHIR_TESTER_HOME_NAME env var or a mounted /branding/name.txt (applied
     # by entrypoint.sh).
     tester:
       home:
-        name: ${HAPI_FHIR_TESTER_HOME_NAME:HL7 Switzerland FHIR Test Kit}
+        name: ${HAPI_FHIR_TESTER_HOME_NAME:eHealth Suisse — CH EMR Test Kit}
         server_address: ${TESTER_SERVER_ADDRESS:http://localhost:8080/fhir}
         refuse_to_fetch_third_party_urls: false
         fhir_version: R4
@@ -65,9 +65,9 @@ hapi:
     install_transitive_ig_dependencies: ${HAPI_FHIR_INSTALL_TRANSITIVE_IG_DEPENDENCIES:true}
 
     # Branding for the built-in tester. The starter serves /content/** from this
-    # path, so the tester picks up custom/logo.jpg and custom/welcome.html, and
-    # the displayed name comes from tester.home.name (above). The image ships
-    # HL7 Switzerland defaults under /branding; mount a host directory at
+    # path, so the tester picks up custom/logo.svg (or .jpg) and custom/welcome.html,
+    # and the displayed name comes from tester.home.name (above). The image ships
+    # eHealth Suisse defaults under /branding; mount a host directory at
     # /branding (or set HAPI_FHIR_CUSTOM_CONTENT_PATH) to override.
     # Bare directory path (the starter wraps it in a FileUrlResource that adds the
     # file: protocol itself, so do NOT prefix with file:). The trailing "//" is

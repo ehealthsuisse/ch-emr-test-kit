@@ -31,9 +31,9 @@ services:
       LOG_PACKAGES: ${LOG_PACKAGES:-INFO}
     ports:
       - "${FHIR_PORT:-8080}:8080"
-    # Branding override: the image ships HL7 Switzerland defaults at /branding.
+    # Branding override: the image ships eHealth Suisse defaults at /branding.
     # To customise the tester, mount a host directory over /branding containing:
-    #   custom/logo.jpg       (logo shown in the tester banner)
+    #   custom/logo.svg       (logo shown in the tester banner; .jpg also works)
     #   custom/welcome.html   (welcome / sample text on the home page)
     #   name.txt              (server name shown in the navbar)
     # Uncomment and point BRANDING_DIR at your folder:

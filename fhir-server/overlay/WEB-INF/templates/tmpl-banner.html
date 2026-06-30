@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<div th:fragment="banner">
+    <div class="row">
+        <div class="col-md-8">
+            <img id="logo" src="img/sample-logo.jpg" width="383" alt="Logo"/>
+        </div>
+        <div class="col-md-4">
+            <img src="img/hapi_fhir_banner_right.png" align="right"/>
+        </div>
+    </div>
+
+    <script>
+        // Custom branding logo, served from the mounted /branding via content/custom/.
+        // Prefer an SVG logo, fall back to a JPG, then to the built-in sample logo.
+        (function () {
+            var candidates = ["content/custom/logo.svg", "content/custom/logo.jpg"];
+            var defaultLogoImageUrl = "img/sample-logo.jpg";
+            var logoImageElement = document.getElementById("logo");
+            (function tryNext(i) {
+                if (i >= candidates.length) { logoImageElement.src = defaultLogoImageUrl; return; }
+                var img = new Image();
+                img.onload = function () { logoImageElement.src = candidates[i]; };
+                img.onerror = function () { tryNext(i + 1); };
+                img.src = candidates[i];
+            })(0);
+        })();
+    </script>
+
+    <!-- Error banner in case anything went wrong -->
+    <div class="alert  alert-danger alert-dismissable" th:if="${errorMsg} != null">
+        <strong>Warning!</strong>
+        <p th:text="${errorMsg}"></p>
+    </div>
+
+</div>
+</html>
