@@ -1,1 +1,1 @@
-HL7 Switzerland FHIR Test Kit
+eHealth Suisse — CH EMR Test Kit
